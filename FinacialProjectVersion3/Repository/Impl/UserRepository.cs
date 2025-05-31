@@ -36,10 +36,13 @@ namespace FinacialProjectVersion3.Repository.Impl
             return await _context.Users
                 .AnyAsync(u => u.Email.ToLower() == email.ToLower());
         }
-
-        public Task<User> GetByUserName(string username)
+        public async Task<User?> GetByUserName(string username)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(username))
+                return null;
+
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
         }
     }
 }

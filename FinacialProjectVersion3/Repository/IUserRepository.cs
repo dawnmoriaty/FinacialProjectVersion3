@@ -7,6 +7,6 @@ namespace FinacialProjectVersion3.Repository
         Task<int> Create(User user);
         Task<bool> UsernameExists(string username);
         Task<bool> EmailExists(string email);
-        Task<User> GetByUserName(string username);
+        Task<User?> GetByUserName(string username);
     }
 }
