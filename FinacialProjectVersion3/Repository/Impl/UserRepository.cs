@@ -62,5 +62,29 @@ namespace FinacialProjectVersion3.Repository.Impl
 
             return result > 0;
         }
+
+        public async Task<bool> EmailExists(string email, int id)
+        {
+            if (string.IsNullOrEmpty(email))
+                return false;
+
+            return await _context.Users
+                .AnyAsync(u => u.Email.ToLower() == email.ToLower() && u.Id != id);
+        }
+
+        public async Task UpdateAsync(User user)
+        {
+            var existingUser = await _context.Users.FindAsync(user.Id);
+            if (existingUser != null)
+            {
+                // Update specific properties
+                existingUser.Email = user.Email;
+                existingUser.FullName = user.FullName;
+                existingUser.AvatarPath = user.AvatarPath;
+
+                // No need for Update() call when working with tracked entity
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

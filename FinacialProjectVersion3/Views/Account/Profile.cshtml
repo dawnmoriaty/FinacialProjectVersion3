@@ -1,0 +1,145 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model FinacialProjectVersion3.ViewModels.Account.ProfileInfoViewModel
+
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+
+<div class="container py-5">
+    <h1 class="mb-4">Hồ sơ cá nhân</h1>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger mb-4">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row">
+        <!-- Phần 1: Cập nhật ảnh đại diện -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Ảnh đại diện</h4>
+                </div>
+                <div class="card-body text-center">
+                    @if (TempData["AvatarSuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mb-3">
+                            @TempData["AvatarSuccessMessage"]
+                        </div>
+                    }
+
+                    @if (TempData["AvatarErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mb-3">
+                            @TempData["AvatarErrorMessage"]
+                        </div>
+                    }
+
+                    <div class="avatar-container mb-4">
+                        @if (!string.IsNullOrEmpty(Model.AvatarPath))
+                        {
+                            <img src="@Model.AvatarPath" alt="Ảnh đại diện" class="img-fluid rounded-circle" style="width: 200px; height: 200px; object-fit: cover;" onerror="this.src='/images/default-avatar.png';" />
+                        }
+                        else
+                        {
+                            <img src="/images/default-avatar.png" alt="Ảnh mặc định" class="img-fluid rounded-circle" style="width: 200px; height: 200px; object-fit: cover;" />
+                        }
+                    </div>
+
+                    <form asp-action="UpdateAvatar" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Chọn ảnh mới</label>
+                            <input name="Avatar" class="form-control" type="file" accept="image/*" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Cập nhật ảnh đại diện</button>
+                    </form>
+
+                    <div class="mt-3">
+                        <small class="text-muted">Hỗ trợ định dạng: JPG, PNG, GIF (tối đa 5MB)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phần 2: Cập nhật thông tin cá nhân -->
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Thông tin cá nhân</h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["InfoSuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mb-3">
+                            @TempData["InfoSuccessMessage"]
+                        </div>
+                    }
+
+                    <form asp-action="UpdateProfile" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên đăng nhập</label>
+                            <input type="text" value="@Model.Username" class="form-control" readonly />
+                            <small class="text-muted">Tên đăng nhập không thể thay đổi</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Phần đổi mật khẩu -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0">Đổi mật khẩu</h4>
+                </div>
+                <div class="card-body">
+                    <p>Nếu bạn muốn đổi mật khẩu, hãy nhấn vào nút bên dưới.</p>
+                    <a asp-action="ChangePassword" class="btn btn-warning">Đổi mật khẩu</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Hiển thị preview ảnh khi chọn file
+        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+            const fileInput = e.target;
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatarImg = document.querySelector('.avatar-container img');
+                    avatarImg.src = e.target.result;
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        });
+    </script>
+}

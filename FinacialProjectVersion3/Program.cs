@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using FinacialProjectVersion3.Services.Impl;
 using FinacialProjectVersion3.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
     });
+builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+});
+var imgDirectory = Path.Combine(builder.Environment.WebRootPath, "img");
+if (!Directory.Exists(imgDirectory))
+{
+    Directory.CreateDirectory(imgDirectory);
+}
 var app = builder.Build();
 
 

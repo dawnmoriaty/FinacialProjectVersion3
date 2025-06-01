@@ -9,5 +9,8 @@ namespace FinacialProjectVersion3.Services
         Task<ServiceResult<User>> Register(RegisterViewModel model);
         Task<ServiceResult<User>> Login(string username, string password);
         Task<ServiceResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+        Task<ServiceResult<User>> UpdateProfileInfo(int userId, string email, string fullName);
+        Task<ServiceResult<User>> UpdateAvatar(int userId, IFormFile avatar);
+        Task<User?> GetUserById(int userId);
     }
 }
