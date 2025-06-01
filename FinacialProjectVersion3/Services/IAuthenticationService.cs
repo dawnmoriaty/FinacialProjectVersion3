@@ -6,6 +6,6 @@ namespace FinacialProjectVersion3.Services
     {
         Task SignInAsync(User user, bool rememberMe = true);
         Task SignOutAsync();
-        int? GetCurrentUserId();
+        
     }
 }

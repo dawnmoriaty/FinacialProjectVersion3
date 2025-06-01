@@ -14,6 +14,36 @@ namespace FinacialProjectVersion3.Services.Impl
             _userRepository = userRepository;
         }
 
+        public async Task<ServiceResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            try
+            {
+                var user = await _userRepository.GetById(userId);
+                if (user == null)
+                {
+                    return  new ServiceResult{ Success = false, Message = "Không tìm thấy thông tin người dùng." };
+                    
+                }
+                if (!PasswordHasher.VerifyPassword(user.PasswordHash, currentPassword))
+                {
+                    return new ServiceResult { Success = false, Message = "Mật khẩu hiện tại không chính xác." };
+                }
+                if (PasswordHasher.VerifyPassword(user.PasswordHash, newPassword))
+                {
+                    return new ServiceResult { Success = false, Message = "Mật khẩu mới phải khác mật khẩu hiện tại." };
+                }
+                string newPasswordHash = PasswordHasher.HashPassword(newPassword);
+
+                user.PasswordHash = newPasswordHash;
+                await _userRepository.UpdatePassword(user.Id, newPasswordHash);
+                return ServiceResult.Succeeded("Đổi mật khẩu thành công!");
+            }
+            catch
+            {
+                return ServiceResult.Failed("Đổi mật khẩu thất bại. Vui lòng thử lại sau.");
+            }
+        }
+
         public async Task<ServiceResult<User>> Login(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))

@@ -63,25 +63,6 @@ namespace FinacialProjectVersion3.Services.Impl
             await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
-        /// <summary>
-        /// Lấy ID người dùng hiện tại từ claims
-        /// </summary>
-        /// <returns>User ID hoặc null nếu chưa đăng nhập</returns>
-        public int? GetCurrentUserId()
-        {
-            var user = _httpContextAccessor.HttpContext?.User;
-
-            if (user?.Identity?.IsAuthenticated != true)
-                return null;
-
-            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-                return null;
-
-            if (int.TryParse(userIdClaim.Value, out int userId))
-                return userId;
-
-            return null;
-        }
+        
     }
 }

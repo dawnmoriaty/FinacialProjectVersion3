@@ -44,5 +44,23 @@ namespace FinacialProjectVersion3.Repository.Impl
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
         }
+
+        public async Task<User?> GetById(int id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        }
+
+        public async Task<bool> UpdatePassword(int userId, string passwordHash)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return false;
+
+            user.PasswordHash = passwordHash;
+            _context.Users.Update(user);
+            var result = await _context.SaveChangesAsync();
+
+            return result > 0;
+        }
     }
 }

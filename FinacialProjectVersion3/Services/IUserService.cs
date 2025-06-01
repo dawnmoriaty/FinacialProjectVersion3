@@ -8,5 +8,6 @@ namespace FinacialProjectVersion3.Services
     {
         Task<ServiceResult<User>> Register(RegisterViewModel model);
         Task<ServiceResult<User>> Login(string username, string password);
+        Task<ServiceResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
     }
 }

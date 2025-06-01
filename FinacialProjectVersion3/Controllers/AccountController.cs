@@ -1,19 +1,25 @@
 ﻿using FinacialProjectVersion3.Services;
 using FinacialProjectVersion3.ViewModels.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace FinacialProjectVersion3.Controllers
 {
-    public class AccountController : Controller 
+    public class AccountController : Controller
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;
+        private readonly ICurrentUser _currentUser;
 
-        public AccountController(IUserService userService, IAuthenticationService authService)
+        public AccountController(
+            IUserService userService,
+            IAuthenticationService authService,
+            ICurrentUser currentUser)
         {
             _userService = userService;
             _authService = authService;
+            _currentUser = currentUser;
         }
         // ======================================Register======================================
 
@@ -92,6 +98,42 @@ namespace FinacialProjectVersion3.Controllers
         {
             await _authService.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+        // ======================================Change Password======================================
+        [HttpGet]
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var userId = _currentUser.Id;
+            if (!userId.HasValue)
+            {
+                return RedirectToAction("Login");
+            }
+            var result = await _userService.ChangePasswordAsync(
+                userId.Value,
+                model.CurrentPassword,
+                model.NewPassword);
+            if (result.Success)
+            {
+                TempData["SuccessMessage"] = result.Message;
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, result.Message);
+                return View(model);
+            }
         }
     }
 }
