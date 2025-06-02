@@ -50,10 +50,11 @@
                         }
                     </div>
 
-                    <form asp-action="UpdateAvatar" method="post" enctype="multipart/form-data">
+                    <form asp-action="UpdateAvatar" asp-controller="Account" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
                         <div class="mb-3">
                             <label class="form-label">Chọn ảnh mới</label>
-                            <input name="Avatar" class="form-control" type="file" accept="image/*" />
+                            <input name="Avatar" class="form-control" type="file" accept="image/*" required />
                         </div>
 
                         <button type="submit" class="btn btn-primary">Cập nhật ảnh đại diện</button>
@@ -80,7 +81,14 @@
                         </div>
                     }
 
-                    <form asp-action="UpdateProfile" method="post">
+                    @if (TempData["InfoErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mb-3">
+                            @TempData["InfoErrorMessage"]
+                        </div>
+                    }
+
+                    <form asp-action="UpdateProfile" asp-controller="Account" method="post">
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -92,13 +100,13 @@
 
                         <div class="mb-3">
                             <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" />
+                            <input asp-for="Email" class="form-control" value="@Model.Email" />
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="FullName" class="form-label"></label>
-                            <input asp-for="FullName" class="form-control" />
+                            <input asp-for="FullName" class="form-control" value="@Model.FullName" />
                             <span asp-validation-for="FullName" class="text-danger"></span>
                         </div>
 
@@ -129,16 +137,64 @@
     }
 
     <script>
-        // Hiển thị preview ảnh khi chọn file
-        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
-            const fileInput = e.target;
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const avatarImg = document.querySelector('.avatar-container img');
-                    avatarImg.src = e.target.result;
-                };
-                reader.readAsDataURL(fileInput.files[0]);
+        // Debug form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Profile form submission
+            const profileForm = document.querySelector('form[asp-action="UpdateProfile"]');
+            if (profileForm) {
+                profileForm.addEventListener('submit', function(e) {
+                    console.log('Profile form submitted');
+                    console.log('Action:', this.action);
+                    console.log('Method:', this.method);
+
+                    // Validate form data
+                    const email = document.querySelector('input[name="Email"]').value;
+                    const fullName = document.querySelector('input[name="FullName"]').value;
+
+                    console.log('Email:', email);
+                    console.log('FullName:', fullName);
+
+                    if (!email || !fullName) {
+                        e.preventDefault();
+                        alert('Vui lòng điền đầy đủ thông tin');
+                        return false;
+                    }
+                });
+            }
+
+            // Avatar form submission
+            const avatarForm = document.querySelector('form[asp-action="UpdateAvatar"]');
+            if (avatarForm) {
+                avatarForm.addEventListener('submit', function(e) {
+                    console.log('Avatar form submitted');
+                    console.log('Action:', this.action);
+                    console.log('Method:', this.method);
+
+                    const fileInput = document.querySelector('input[name="Avatar"]');
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        e.preventDefault();
+                        alert('Vui lòng chọn ảnh đại diện');
+                        return false;
+                    }
+                });
+            }
+
+            // Hiển thị preview ảnh khi chọn file
+            const fileInput = document.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const fileInput = e.target;
+                    if (fileInput.files && fileInput.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const avatarImg = document.querySelector('.avatar-container img');
+                            if (avatarImg) {
+                                avatarImg.src = e.target.result;
+                            }
+                        };
+                        reader.readAsDataURL(fileInput.files[0]);
+                    }
+                });
             }
         });
     </script>

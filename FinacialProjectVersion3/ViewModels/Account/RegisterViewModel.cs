@@ -2,7 +2,7 @@
 
 namespace FinacialProjectVersion3.ViewModels.Account
 {
-    public class RegisterViewModel
+    public class RegisterViewModel 
     {
         [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
         [StringLength(50, MinimumLength = 4, ErrorMessage = "Tên đăng nhập phải từ 4-50 ký tự")]

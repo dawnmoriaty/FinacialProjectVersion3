@@ -15,7 +15,7 @@ namespace FinacialProjectVersion3.ViewModels.Account
         public string FullName { get; set; }
 
         // Chỉ để hiển thị, không cho phép thay đổi
-        public string Username { get; set; }
+        public string? Username { get; set; }
         public string? AvatarPath { get; set; }
     }
 }

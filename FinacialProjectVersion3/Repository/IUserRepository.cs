@@ -12,6 +12,9 @@ namespace FinacialProjectVersion3.Repository
         Task<bool> UpdatePassword(int userId, string passwordHash);
         Task<bool> EmailExists(string email , int id);
         Task UpdateAsync(User user);
+        Task<bool> SaveChangesAsync();
+        Task<bool> UpdateProfileAsync(User user);
+        Task<bool> UpdateAvatarAsync(User user);
 
     }
 }

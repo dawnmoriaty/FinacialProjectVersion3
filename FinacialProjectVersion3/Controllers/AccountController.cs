@@ -11,15 +11,18 @@ namespace FinacialProjectVersion3.Controllers
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;
         private readonly ICurrentUser _currentUser;
+        private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             IUserService userService,
             IAuthenticationService authService,
-            ICurrentUser currentUser)
+            ICurrentUser currentUser,
+            ILogger<AccountController> logger)
         {
             _userService = userService;
             _authService = authService;
             _currentUser = currentUser;
+            _logger = logger;
         }
         // ======================================Register======================================
 
@@ -142,23 +145,20 @@ namespace FinacialProjectVersion3.Controllers
         {
             try
             {
-                // Lấy ID người dùng hiện tại
-                var userId =  _currentUser.Id  ;
-
+                var userId = _currentUser.Id;
                 if (!userId.HasValue)
                 {
+                    _logger.LogWarning("Trying to access profile without being logged in");
                     return RedirectToAction("Login");
                 }
 
-                // Lấy thông tin người dùng
                 var user = await _userService.GetUserById(userId.Value);
-
                 if (user == null)
                 {
+                    _logger.LogWarning("User {UserId} not found in database", userId.Value);
                     return NotFound();
                 }
 
-                // Tạo view model
                 var model = new ProfileInfoViewModel
                 {
                     Email = user.Email,
@@ -171,8 +171,8 @@ namespace FinacialProjectVersion3.Controllers
             }
             catch (Exception ex)
             {
-                // Log exception
-                TempData["ErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
+                _logger.LogError(ex, "Error loading user profile");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi tải thông tin hồ sơ";
                 return RedirectToAction("Index", "Home");
             }
         }
@@ -184,9 +184,7 @@ namespace FinacialProjectVersion3.Controllers
         {
             try
             {
-                // Lấy ID người dùng hiện tại
                 var userId = _currentUser.Id;
-
                 if (!userId.HasValue)
                 {
                     return RedirectToAction("Login");
@@ -198,31 +196,28 @@ namespace FinacialProjectVersion3.Controllers
 
                     if (result.Success)
                     {
-                        // Đăng nhập lại để cập nhật claims trong cookie nếu thông tin quan trọng thay đổi
+                        // Cập nhật lại authentication claims
                         await _authService.SignInAsync(result.Data);
-
                         TempData["InfoSuccessMessage"] = result.Message;
+                        return RedirectToAction("Profile");
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, result.Message);
+                        TempData["InfoErrorMessage"] = result.Message;
                     }
                 }
-
-                // Lấy lại thông tin người dùng để hiển thị
-                var user = await _userService.GetUserById(userId.Value);
-                if (user != null)
+                else
                 {
-                    // Chỉ cập nhật AvatarPath, giữ nguyên các thông tin khác từ model
-                    model.AvatarPath = user.AvatarPath;
+                    // Thêm lỗi validation vào TempData
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    TempData["InfoErrorMessage"] = string.Join(", ", errors);
                 }
 
-                return View("Profile", model);
+                return RedirectToAction("Profile");
             }
             catch (Exception ex)
             {
-                // Log exception
-                TempData["ErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
+                TempData["InfoErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
                 return RedirectToAction("Profile");
             }
         }
@@ -234,9 +229,7 @@ namespace FinacialProjectVersion3.Controllers
         {
             try
             {
-                // Lấy ID người dùng hiện tại
                 var userId = _currentUser.Id;
-
                 if (!userId.HasValue)
                 {
                     return RedirectToAction("Login");
@@ -264,7 +257,6 @@ namespace FinacialProjectVersion3.Controllers
             }
             catch (Exception ex)
             {
-                // Log exception
                 TempData["AvatarErrorMessage"] = $"Đã xảy ra lỗi khi cập nhật ảnh: {ex.Message}";
                 return RedirectToAction("Profile");
             }
