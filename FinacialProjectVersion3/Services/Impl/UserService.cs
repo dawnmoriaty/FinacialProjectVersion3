@@ -2,8 +2,7 @@
 using FinacialProjectVersion3.Repository;
 using FinacialProjectVersion3.Utils;
 using FinacialProjectVersion3.ViewModels.Account;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+
 
 namespace FinacialProjectVersion3.Services.Impl
 {
@@ -181,9 +180,17 @@ namespace FinacialProjectVersion3.Services.Impl
                 user.AvatarPath = $"/img/{uniqueFileName}";
 
                 // Lưu thay đổi
-                await _userRepository.UpdateAsync(user);
+                var updateResult = await _userRepository.UpdateAvatarAsync(user);
 
-                return ServiceResult<User>.Succeeded(user, "Cập nhật ảnh đại diện thành công!");
+                if (!updateResult)
+                {
+                    return ServiceResult<User>.Failed("Không thể cập nhật ảnh đại diện. Vui lòng thử lại.");
+                }
+
+                // Lấy lại user từ database
+                var updatedUser = await _userRepository.GetById(userId);
+
+                return ServiceResult<User>.Succeeded(updatedUser, "Cập nhật ảnh đại diện thành công!");
             }
             catch (Exception ex)
             {
@@ -194,6 +201,17 @@ namespace FinacialProjectVersion3.Services.Impl
         {
             try
             {
+                // Validate input
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return ServiceResult<User>.Failed("Email không được để trống.");
+                }
+
+                if (string.IsNullOrWhiteSpace(fullName))
+                {
+                    return ServiceResult<User>.Failed("Họ tên không được để trống.");
+                }
+
                 // Kiểm tra người dùng tồn tại
                 var user = await _userRepository.GetById(userId);
                 if (user == null)
@@ -202,22 +220,34 @@ namespace FinacialProjectVersion3.Services.Impl
                 }
 
                 // Kiểm tra email đã tồn tại chưa (nếu email thay đổi)
-                if (email != user.Email)
+                if (!string.Equals(email.Trim(), user.Email, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (await _userRepository.EmailExists(email, userId))
+                    if (await _userRepository.EmailExists(email.Trim(), userId))
                     {
                         return ServiceResult<User>.Failed("Email đã được sử dụng bởi tài khoản khác.");
                     }
                 }
 
+                // Lưu giá trị cũ để log
+                var oldEmail = user.Email;
+                var oldFullName = user.FullName;
+
                 // Cập nhật thông tin
-                user.Email = email;
-                user.FullName = fullName;
+                user.Email = email.Trim();
+                user.FullName = fullName.Trim();
 
                 // Lưu thay đổi
-                await _userRepository.UpdateAsync(user);
+                var updateResult = await _userRepository.UpdateProfileAsync(user);
 
-                return ServiceResult<User>.Succeeded(user, "Cập nhật thông tin cá nhân thành công!");
+                if (!updateResult)
+                {
+                    return ServiceResult<User>.Failed("Không thể cập nhật thông tin. Vui lòng thử lại.");
+                }
+
+                // Lấy lại user từ database để đảm bảo dữ liệu đã được cập nhật
+                var updatedUser = await _userRepository.GetById(userId);
+
+                return ServiceResult<User>.Succeeded(updatedUser, "Cập nhật thông tin cá nhân thành công!");
             }
             catch (Exception ex)
             {
@@ -225,4 +255,5 @@ namespace FinacialProjectVersion3.Services.Impl
             }
         }
     }
+    
 }

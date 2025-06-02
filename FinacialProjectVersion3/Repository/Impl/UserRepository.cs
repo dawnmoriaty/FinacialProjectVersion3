@@ -74,16 +74,96 @@ namespace FinacialProjectVersion3.Repository.Impl
 
         public async Task UpdateAsync(User user)
         {
-            var existingUser = await _context.Users.FindAsync(user.Id);
-            if (existingUser != null)
+            try
             {
-                // Update specific properties
+                // Tìm user hiện tại từ database
+                var existingUser = await _context.Users.FindAsync(user.Id);
+
+                if (existingUser == null)
+                    throw new Exception($"User with ID {user.Id} not found");
+
+                // Cập nhật từng trường một
                 existingUser.Email = user.Email;
                 existingUser.FullName = user.FullName;
+
+                // Chỉ cập nhật AvatarPath nếu có giá trị mới
+                if (!string.IsNullOrEmpty(user.AvatarPath))
+                {
+                    existingUser.AvatarPath = user.AvatarPath;
+                }
+
+                // SaveChanges sẽ được gọi ở SaveChangesAsync()
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating user: {ex.Message}", ex);
+            }
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            try
+            {
+                return (await _context.SaveChangesAsync()) > 0;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception($"Database error: {ex.Message}", ex);
+            }
+        }
+        public async Task<bool> UpdateProfileAsync(User user)
+        {
+            try
+            {
+                var existingUser = await _context.Users.FindAsync(user.Id);
+                if (existingUser == null)
+                {
+                    return false;
+                }
+
+                // Cập nhật các trường thông tin cá nhân
+                existingUser.Email = user.Email;
+                existingUser.FullName = user.FullName;
+
+                // Đánh dấu entity đã thay đổi
+                _context.Entry(existingUser).State = EntityState.Modified;
+
+                // Lưu thay đổi
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                // Log exception nếu cần
+                throw new Exception($"Lỗi khi cập nhật profile: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<bool> UpdateAvatarAsync(User user)
+        {
+            try
+            {
+                var existingUser = await _context.Users.FindAsync(user.Id);
+                if (existingUser == null)
+                {
+                    return false;
+                }
+
+                // Cập nhật avatar path
                 existingUser.AvatarPath = user.AvatarPath;
 
-                // No need for Update() call when working with tracked entity
-                await _context.SaveChangesAsync();
+                // Đánh dấu entity đã thay đổi
+                _context.Entry(existingUser).State = EntityState.Modified;
+
+                // Lưu thay đổi
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                // Log exception nếu cần
+                throw new Exception($"Lỗi khi cập nhật avatar: {ex.Message}", ex);
             }
         }
     }
