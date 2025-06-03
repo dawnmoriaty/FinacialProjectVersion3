@@ -1,29 +1,30 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@model FinacialProjectVersion3.ViewModels.Category.CategoryCreateViewModel
+@model FinacialProjectVersion3.ViewModels.Category.CategoryEditViewModel
 @{
-    ViewData["Title"] = "Tạo danh mục mới";
+    ViewData["Title"] = "Chỉnh sửa danh mục";
 }
 
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-warning text-dark">
                     <h4 class="mb-0">
-                        <i class="fas fa-plus-circle"></i> Thêm danh mục mới
+                        <i class="fas fa-edit"></i> Chỉnh sửa danh mục
                     </h4>
                 </div>
 
                 <div class="card-body">
-                    <form asp-action="Create" method="post">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
                         <!-- Tên danh mục -->
                         <div class="form-group mb-3">
                             <label asp-for="Name" class="form-label fw-bold"></label>
-                            <input asp-for="Name" class="form-control" placeholder="Ví dụ: Lương, Ăn sáng, Xăng xe..." />
+                            <input asp-for="Name" class="form-control" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
 
@@ -34,9 +35,6 @@
                                 <option value="">-- Chọn loại danh mục --</option>
                             </select>
                             <span asp-validation-for="Type" class="text-danger"></span>
-                            <div class="form-text">
-                                <i class="fas fa-info-circle"></i> Thu nhập: tiền vào | Chi tiêu: tiền ra
-                            </div>
                         </div>
 
                         <!-- Icon -->
@@ -51,9 +49,25 @@
                             <div class="mt-2 p-2 bg-light rounded">
                                 <small class="text-muted">Xem trước: </small>
                                 <span id="iconPreview">
-                                    <i class="fas fa-folder text-muted"></i>
+                                    @if (!string.IsNullOrEmpty(Model.IconPath))
+                                    {
+                                        <i class="fas @Model.IconPath text-primary" style="font-size: 1.5em;"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-folder text-muted"></i>
+                                    }
                                 </span>
-                                <span id="iconName" class="ms-2 text-muted">Không có icon</span>
+                                <span id="iconName" class="ms-2">
+                                    @if (!string.IsNullOrEmpty(Model.IconPath))
+                                    {
+                                        <span class="text-primary">@Model.Icons.FirstOrDefault(i => i.Value == Model.IconPath)?.Text</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Không có icon</span>
+                                    }
+                                </span>
                             </div>
                         </div>
 
@@ -62,8 +76,8 @@
                             <a asp-action="Index" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Quay lại
                             </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Lưu danh mục
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Cập nhật
                             </button>
                         </div>
                     </form>
@@ -79,7 +93,7 @@
     }
 
     <script>
-        // Icon preview functionality
+        // Icon preview functionality (same as Create)
         document.getElementById('iconSelect').addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             const iconClass = this.value;
@@ -90,12 +104,10 @@
 
             if (iconClass) {
                 preview.innerHTML = `<i class="fas ${iconClass} text-primary" style="font-size: 1.5em;"></i>`;
-                nameSpan.textContent = iconText;
-                nameSpan.className = 'ms-2 text-primary';
+                nameSpan.innerHTML = `<span class="text-primary">${iconText}</span>`;
             } else {
                 preview.innerHTML = '<i class="fas fa-folder text-muted"></i>';
-                nameSpan.textContent = 'Không có icon';
-                nameSpan.className = 'ms-2 text-muted';
+                nameSpan.innerHTML = '<span class="text-muted">Không có icon</span>';
             }
         });
     </script>

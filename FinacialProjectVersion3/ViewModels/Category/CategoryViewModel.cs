@@ -17,5 +17,9 @@ namespace FinacialProjectVersion3.ViewModels.Category
 
         [Display(Name = "Icon")]
         public string IconPath { get; set; }
+        public string TypeDisplay => Type == "income" ? "Thu nhập" : "Chi tiêu";
+
+        // CSS class cho badge
+        public string TypeBadgeClass => Type == "income" ? "bg-success" : "bg-danger";
     }
 }
