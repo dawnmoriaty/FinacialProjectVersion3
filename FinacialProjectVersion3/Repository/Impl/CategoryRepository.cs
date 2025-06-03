@@ -11,6 +11,13 @@ namespace FinacialProjectVersion3.Repository.Impl
         {
             _context = context;
         }
+
+        public async Task<int> Create(Category category)
+        {
+            var categories = await _context.Categories.AddAsync(category);
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<Category>> GetAllCategoryByUserId(int userId)
         {
             return await _context.Categories

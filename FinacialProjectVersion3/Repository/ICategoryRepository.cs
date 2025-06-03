@@ -5,5 +5,6 @@ namespace FinacialProjectVersion3.Repository
     public interface ICategoryRepository
     {
         Task<IEnumerable<Category>> GetAllCategoryByUserId(int userId);
+        Task<int> Create(Category category);
     }
 }
