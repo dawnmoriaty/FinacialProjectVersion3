@@ -29,7 +29,7 @@ namespace FinacialProjectVersion3.Repository.Impl
 
         public async Task<bool> Update(Transaction transaction)
         {
-            transaction.UpdatedAt = DateTime.Now;
+            try
             _context.Transactions.Update(transaction);
             var result = await _context.SaveChangesAsync();
             return result > 0;
