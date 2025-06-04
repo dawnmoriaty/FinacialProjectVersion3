@@ -19,5 +19,9 @@ namespace FinacialProjectVersion3.Repository
         Task<decimal> GetTotalIncomeByUserId(int userId, DateTime? fromDate = null, DateTime? toDate = null);
         Task<decimal> GetTotalExpenseByUserId(int userId, DateTime? fromDate = null, DateTime? toDate = null);
         Task<List<Transaction>> GetRecentTransactions(int userId, int count = 5);
+        Task<bool> UpdateByFields(int id, string description, decimal amount, int categoryId, DateTime transactionDate, int userId);  
     }
-}
+    
+   }
+
+

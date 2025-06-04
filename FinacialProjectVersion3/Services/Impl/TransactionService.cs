@@ -71,9 +71,14 @@ namespace FinacialProjectVersion3.Services.Impl
         {
             try
             {
-                var transaction = await _transactionRepository.GetByIdAndUserId(model.Id, userId);
-                if (transaction == null)
+                Console.WriteLine($"[SERVICE] Updating transaction ID: {model.Id} for user: {userId}");
+                Console.WriteLine($"[SERVICE] New values - Description: '{model.Description}', Amount: {model.Amount}, CategoryId: {model.CategoryId}");
+
+                // Kiểm tra transaction tồn tại và thuộc về user
+                var existingTransaction = await _transactionRepository.GetByIdAndUserId(model.Id, userId);
+                if (existingTransaction == null)
                 {
+                    Console.WriteLine("[SERVICE] Transaction not found");
                     return ServiceResult.Failed("Giao dịch không tồn tại");
                 }
 
@@ -81,17 +86,24 @@ namespace FinacialProjectVersion3.Services.Impl
                 var category = await _categoryRepository.GetByIdAndUserId(model.CategoryId, userId);
                 if (category == null)
                 {
+                    Console.WriteLine("[SERVICE] Category not found or doesn't belong to user");
                     return ServiceResult.Failed("Danh mục không tồn tại hoặc không thuộc về bạn");
                 }
 
-                transaction.Description = model.Description;
-                transaction.Amount = model.Amount;
-                transaction.CategoryId = model.CategoryId;
-                transaction.TransactionDate = model.TransactionDate;
-                transaction.UpdatedAt = DateTime.Now;
+                Console.WriteLine($"[SERVICE] Old values - Description: '{existingTransaction.Description}', Amount: {existingTransaction.Amount}");
 
-                var result = await _transactionRepository.Update(transaction);
-                if (result)
+                // Sử dụng phương pháp update by fields để tránh tracking issues
+                var updateResult = await _transactionRepository.UpdateByFields(
+                    model.Id, 
+                    model.Description, 
+                    model.Amount, 
+                    model.CategoryId, 
+                    model.TransactionDate, 
+                    userId);
+
+                Console.WriteLine($"[SERVICE] Update result: {updateResult}");
+
+                if (updateResult)
                 {
                     return ServiceResult.Succeeded("Cập nhật giao dịch thành công!");
                 }
@@ -100,6 +112,8 @@ namespace FinacialProjectVersion3.Services.Impl
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[SERVICE] Exception in UpdateTransaction: {ex.Message}");
+                Console.WriteLine($"[SERVICE] Stack trace: {ex.StackTrace}");
                 return ServiceResult.Failed($"Lỗi khi cập nhật giao dịch: {ex.Message}");
             }
         }

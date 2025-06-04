@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FinacialProjectVersion3.ViewModels.Transaction
 {
@@ -10,7 +11,7 @@ namespace FinacialProjectVersion3.ViewModels.Transaction
         [Required(ErrorMessage = "Vui lòng nhập mô tả")]
         [StringLength(200, ErrorMessage = "Mô tả không được vượt quá 200 ký tự")]
         [Display(Name = "Mô tả")]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập số tiền")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Số tiền phải lớn hơn 0")]
@@ -28,8 +29,6 @@ namespace FinacialProjectVersion3.ViewModels.Transaction
 
         public List<SelectListItem>? IncomeCategories { get; set; }
         public List<SelectListItem>? ExpenseCategories { get; set; }
-
-        // Hiển thị loại danh mục hiện tại
-        public string CurrentCategoryType { get; set; }
+        public string CurrentCategoryType { get; set; } = string.Empty;
     }
 }

@@ -30,9 +30,52 @@ namespace FinacialProjectVersion3.Repository.Impl
         public async Task<bool> Update(Transaction transaction)
         {
             try
-            _context.Transactions.Update(transaction);
-            var result = await _context.SaveChangesAsync();
-            return result > 0;
+            {
+                // Detach any existing tracked entity
+                var existingEntry = _context.Entry(transaction);
+                if (existingEntry.State == EntityState.Detached)
+                {
+                    _context.Transactions.Update(transaction);
+                }
+                else
+                {
+                    existingEntry.CurrentValues.SetValues(transaction);
+                }
+
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Update: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateByFields(int id, string description, decimal amount, int categoryId, DateTime transactionDate, int userId)
+        {
+            try
+            {
+                var transaction = await _context.Transactions
+                    .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+
+                if (transaction == null)
+                    return false;
+
+                transaction.Description = description;
+                transaction.Amount = amount;
+                transaction.CategoryId = categoryId;
+                transaction.TransactionDate = transactionDate;
+                transaction.UpdatedAt = DateTime.Now;
+
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UpdateByFields: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<bool> Delete(int id, int userId)

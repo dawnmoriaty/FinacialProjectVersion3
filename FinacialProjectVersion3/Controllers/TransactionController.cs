@@ -12,16 +12,18 @@ namespace FinacialProjectVersion3.Controllers
     {
         private readonly ITransactionService _transactionService;
         private readonly ICategoryService _categoryService;
+        private readonly ICurrentUser _currrentUser;
 
-        public TransactionController(ITransactionService transactionService, ICategoryService categoryService)
+        public TransactionController(ITransactionService transactionService, ICategoryService categoryService, ICurrentUser currrentUser)
         {
             _transactionService = transactionService;
             _categoryService = categoryService;
+            _currrentUser = currrentUser;
         }
 
         private int GetCurrentUserId()
         {
-            return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            return (int)_currrentUser.Id;
         }
 
         // GET: Transaction
@@ -118,9 +120,13 @@ namespace FinacialProjectVersion3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(TransactionEditViewModel model)
         {
+            Console.WriteLine($"[CONTROLLER] Received model - ID: {model.Id}, Description: '{model.Description}', Amount: {model.Amount}, CategoryId: {model.CategoryId}");
+            
             if (ModelState.IsValid)
             {
                 var userId = GetCurrentUserId();
+                Console.WriteLine($"[CONTROLLER] Current user ID: {userId}");
+                
                 var result = await _transactionService.UpdateTransaction(model, userId);
 
                 if (result.Success)
@@ -129,7 +135,16 @@ namespace FinacialProjectVersion3.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
+                Console.WriteLine($"[CONTROLLER] Update failed: {result.Message}");
                 ModelState.AddModelError("", result.Message);
+            }
+            else
+            {
+                Console.WriteLine("[CONTROLLER] ModelState is invalid:");
+                foreach (var error in ModelState)
+                {
+                    Console.WriteLine($"[CONTROLLER] {error.Key}: {string.Join(", ", error.Value.Errors.Select(e => e.ErrorMessage))}");
+                }
             }
 
             await LoadCategoriesForEdit(model);
