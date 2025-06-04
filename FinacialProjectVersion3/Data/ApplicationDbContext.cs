@@ -11,6 +11,7 @@ namespace FinacialProjectVersion3.Data
         // DbSet properties for your entities
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
         // Add other DbSets as needed
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

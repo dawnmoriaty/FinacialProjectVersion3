@@ -1,0 +1,319 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model FinacialProjectVersion3.ViewModels.Transaction.TransactionListViewModel
+@{
+    ViewData["Title"] = "Quản lý Giao dịch";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-exchange-alt text-primary me-2"></i>Quản lý Giao dịch</h2>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm giao dịch
+                </a>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Tổng quan -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Thu nhập</h6>
+                                    <h4>@Model.TotalIncome.ToString("N0") ₫</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-arrow-up fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Chi tiêu</h6>
+                                    <h4>@Model.TotalExpense.ToString("N0") ₫</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-arrow-down fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card @(Model.Balance >= 0 ? "bg-info" : "bg-warning") text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Số dư</h6>
+                                    <h4>@Model.Balance.ToString("N0") ₫</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-wallet fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Tổng giao dịch</h6>
+                                    <h4>@Model.TotalItems</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-list fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bộ lọc -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                            <i class="fas fa-filter"></i> Bộ lọc tìm kiếm
+                        </button>
+                    </h5>
+                </div>
+                <div id="filterCollapse" class="collapse @(Model.Filter.Type != null || Model.Filter.CategoryId != null || Model.Filter.FromDate != null || Model.Filter.ToDate != null || !string.IsNullOrEmpty(Model.Filter.SearchTerm) ? "show" : "")">
+                    <div class="card-body">
+                        <form method="get" asp-action="Index">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label asp-for="Filter.Type" class="form-label">Loại giao dịch</label>
+                                    <select asp-for="Filter.Type" asp-items="Model.Filter.TransactionTypes" class="form-select">
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label asp-for="Filter.CategoryId" class="form-label">Danh mục</label>
+                                    <select asp-for="Filter.CategoryId" asp-items="Model.Filter.Categories" class="form-select">
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label asp-for="Filter.FromDate" class="form-label">Từ ngày</label>
+                                    <input asp-for="Filter.FromDate" class="form-control" type="date" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label asp-for="Filter.ToDate" class="form-label">Đến ngày</label>
+                                    <input asp-for="Filter.ToDate" class="form-control" type="date" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label asp-for="Filter.SearchTerm" class="form-label">Tìm kiếm</label>
+                                    <input asp-for="Filter.SearchTerm" class="form-control" placeholder="Mô tả..." />
+                                </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách giao dịch -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Danh sách giao dịch</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Transactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Ngày</th>
+                                        <th>Mô tả</th>
+                                        <th>Danh mục</th>
+                                        <th>Loại</th>
+                                        <th class="text-end">Số tiền</th>
+                                        <th class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in Model.Transactions)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <small class="text-muted">@transaction.TransactionDate.ToString("dd/MM/yyyy")</small>
+                                            </td>
+                                            <td>
+                                                <strong>@transaction.Description</strong>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(transaction.Category?.IconPath))
+                                                {
+                                                    <i class="fas @transaction.Category.IconPath me-1"></i>
+                                                }
+                                                @transaction.Category?.Name
+                                            </td>
+                                            <td>
+                                                @if (transaction.Category?.Type == "income")
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-arrow-up"></i> Thu nhập
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-arrow-down"></i> Chi tiêu
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-end">
+                                                <strong class="@(transaction.Category?.Type == "income" ? "text-success" : "text-danger")">
+                                                    @(transaction.Category?.Type == "income" ? "+" : "-")@transaction.Amount.ToString("N0") ₫
+                                                </strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a asp-action="Details" asp-route-id="@transaction.Id" class="btn btn-outline-info" title="Xem chi tiết">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@transaction.Id" class="btn btn-outline-warning" title="Chỉnh sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-outline-danger" onclick="confirmDelete(@transaction.Id)" title="Xóa">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (Model.TotalPages > 1)
+                        {
+                            <nav aria-label="Transaction pagination">
+                                <ul class="pagination justify-content-center">
+                                    @if (Model.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Index", new {
+                                                page = Model.CurrentPage - 1,
+                                                pageSize = Model.PageSize,
+                                                type = Model.Filter.Type,
+                                                categoryId = Model.Filter.CategoryId,
+                                                fromDate = Model.Filter.FromDate?.ToString("yyyy-MM-dd"),
+                                                toDate = Model.Filter.ToDate?.ToString("yyyy-MM-dd"),
+                                                searchTerm = Model.Filter.SearchTerm
+                                            })">Trước</a>
+                                        </li>
+                                    }
+
+                                    @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                                    {
+                                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Index", new {
+                                                page = i,
+                                                pageSize = Model.PageSize,
+                                                type = Model.Filter.Type,
+                                                categoryId = Model.Filter.CategoryId,
+                                                fromDate = Model.Filter.FromDate?.ToString("yyyy-MM-dd"),
+                                                toDate = Model.Filter.ToDate?.ToString("yyyy-MM-dd"),
+                                                searchTerm = Model.Filter.SearchTerm
+                                            })">@i</a>
+                                        </li>
+                                    }
+
+                                    @if (Model.CurrentPage < Model.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Index", new {
+                                                page = Model.CurrentPage + 1,
+                                                pageSize = Model.PageSize,
+                                                type = Model.Filter.Type,
+                                                categoryId = Model.Filter.CategoryId,
+                                                fromDate = Model.Filter.FromDate?.ToString("yyyy-MM-dd"),
+                                                toDate = Model.Filter.ToDate?.ToString("yyyy-MM-dd"),
+                                                searchTerm = Model.Filter.SearchTerm
+                                            })">Sau</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có giao dịch nào</h5>
+                            <p class="text-muted mb-3">Hãy tạo giao dịch đầu tiên của bạn!</p>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Thêm giao dịch
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa giao dịch này không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(id) {
+            document.getElementById('deleteForm').action = '/Transaction/Delete/' + id;
+            var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+        }
+    </script>
+}

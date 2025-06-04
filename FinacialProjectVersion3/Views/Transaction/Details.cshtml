@@ -1,0 +1,155 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model FinacialProjectVersion3.Models.Entity.Transaction
+@{
+    ViewData["Title"] = "Chi tiết giao dịch";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Chi tiết giao dịch
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mô tả:</label>
+                                <p class="form-control-plaintext">@Model.Description</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Số tiền:</label>
+                                <p class="form-control-plaintext">
+                                    <span class="h5 @(Model.Category?.Type == "income" ? "text-success" : "text-danger")">
+                                        @(Model.Category?.Type == "income" ? "+" : "-")@Model.Amount.ToString("N0") ₫
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày giao dịch:</label>
+                                <p class="form-control-plaintext">@Model.TransactionDate.ToString("dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Loại giao dịch:</label>
+                                <p class="form-control-plaintext">
+                                    @if (Model.Category?.Type == "income")
+                                    {
+                                        <span class="badge bg-success fs-6">
+                                            <i class="fas fa-arrow-up"></i> Thu nhập
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger fs-6">
+                                            <i class="fas fa-arrow-down"></i> Chi tiêu
+                                        </span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Danh mục:</label>
+                                <p class="form-control-plaintext">
+                                    @if (!string.IsNullOrEmpty(Model.Category?.IconPath))
+                                    {
+                                        <i class="fas @Model.Category.IconPath me-2"></i>
+                                    }
+                                    @Model.Category?.Name
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày tạo:</label>
+                                <p class="form-control-plaintext">
+                                    <small class="text-muted">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.UpdatedAt != Model.CreatedAt)
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Cập nhật lần cuối:</label>
+                                    <p class="form-control-plaintext">
+                                        <small class="text-muted">@Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                        </a>
+
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Chỉnh sửa
+                            </a>
+                            <button type="button" class="btn btn-danger" onclick="confirmDelete(@Model.Id)">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa giao dịch "<strong>@Model.Description</strong>" không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(id) {
+            document.getElementById('deleteForm').action = '/Transaction/Delete/' + id;
+            var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+        }
+    </script>
+}

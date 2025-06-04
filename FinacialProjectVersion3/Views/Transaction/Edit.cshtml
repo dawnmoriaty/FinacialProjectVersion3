@@ -1,0 +1,137 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model FinacialProjectVersion3.ViewModels.Transaction.TransactionEditViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa giao dịch";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa giao dịch
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input asp-for="Id" type="hidden" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Description" class="form-label"></label>
+                                <input asp-for="Description" class="form-control" placeholder="Nhập mô tả giao dịch..." />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Amount" class="form-label"></label>
+                                <div class="input-group">
+                                    <input asp-for="Amount" class="form-control" placeholder="0" />
+                                    <span class="input-group-text">₫</span>
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TransactionDate" class="form-label"></label>
+                                <input asp-for="TransactionDate" class="form-control" type="date" />
+                                <span asp-validation-for="TransactionDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Loại giao dịch</label>
+                                <div class="btn-group w-100" role="group" id="transactionTypeToggle">
+                                    <input type="radio" class="btn-check" name="transactionType" id="incomeType" value="income" autocomplete="off" @(Model.CurrentCategoryType == "income" ? "checked" : "")>
+                                    <label class="btn btn-outline-success" for="incomeType">
+                                        <i class="fas fa-arrow-up"></i> Thu nhập
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="transactionType" id="expenseType" value="expense" autocomplete="off" @(Model.CurrentCategoryType == "expense" ? "checked" : "")>
+                                    <label class="btn btn-outline-danger" for="expenseType">
+                                        <i class="fas fa-arrow-down"></i> Chi tiêu
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="form-label"></label>
+                            <select asp-for="CategoryId" class="form-select" id="categorySelect">
+                                <option value="">Chọn danh mục...</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Cập nhật
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Dữ liệu danh mục
+        const incomeCategories = @Html.Raw(Json.Serialize(Model.IncomeCategories ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>()));
+        const expenseCategories = @Html.Raw(Json.Serialize(Model.ExpenseCategories ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>()));
+        const currentCategoryId = @Model.CategoryId;
+
+        // Xử lý thay đổi loại giao dịch
+        document.querySelectorAll('input[name="transactionType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateCategoryOptions(this.value);
+            });
+        });
+
+        function updateCategoryOptions(type) {
+            const categorySelect = document.getElementById('categorySelect');
+            categorySelect.innerHTML = '<option value="">Chọn danh mục...</option>';
+
+            const categories = type === 'income' ? incomeCategories : expenseCategories;
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.value;
+                option.textContent = category.text;
+                if (category.value == currentCategoryId) {
+                    option.selected = true;
+                }
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Khởi tạo với loại hiện tại
+        const currentType = '@Model.CurrentCategoryType';
+        updateCategoryOptions(currentType);
+
+        // Format số tiền
+        document.getElementById('@Html.IdFor(m => m.Amount)').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, '');
+            if (value) {
+                e.target.value = parseInt(value).toLocaleString('vi-VN');
+            }
+        });
+
+        // Xóa format khi submit
+        document.querySelector('form').addEventListener('submit', function() {
+            const amountInput = document.getElementById('@Html.IdFor(m => m.Amount)');
+            amountInput.value = amountInput.value.replace(/[^\d]/g, '');
+        });
+    </script>
+}
