@@ -12,11 +12,11 @@ namespace FinacialProjectVersion3.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Configure entity properties and relationships here if needed
+           
         }
     }
 }
