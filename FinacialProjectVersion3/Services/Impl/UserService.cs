@@ -254,6 +254,78 @@ namespace FinacialProjectVersion3.Services.Impl
                 return ServiceResult<User>.Failed($"Lỗi khi cập nhật thông tin: {ex.Message}");
             }
         }
+        // =========================== admin function block user ===========================
+        public async Task<List<User>> GetAllUsers()
+        {
+            return await _userRepository.GetAllUsers();
+        }
+
+        public async Task<ServiceResult> BlockUser(int userId)
+        {
+            try
+            {
+                var user = await _userRepository.GetById(userId);
+                if (user == null)
+                {
+                    return ServiceResult.Failed("Không tìm thấy người dùng.");
+                }
+
+                if (user.Role == "admin")
+                {
+                    return ServiceResult.Failed("Không thể khóa tài khoản admin.");
+                }
+
+                if (user.IsBlocked)
+                {
+                    return ServiceResult.Failed("Tài khoản đã bị khóa.");
+                }
+
+                var result = await _userRepository.UpdateUserBlockStatus(userId, true);
+                if (result)
+                {
+                    return ServiceResult.Succeeded($"Đã khóa tài khoản {user.Username}.");
+                }
+                else
+                {
+                    return ServiceResult.Failed("Không thể khóa tài khoản. Vui lòng thử lại.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult.Failed($"Lỗi khi khóa tài khoản: {ex.Message}");
+            }
+        }
+
+        public async Task<ServiceResult> UnblockUser(int userId)
+        {
+            try
+            {
+                var user = await _userRepository.GetById(userId);
+                if (user == null)
+                {
+                    return ServiceResult.Failed("Không tìm thấy người dùng.");
+                }
+
+                if (!user.IsBlocked)
+                {
+                    return ServiceResult.Failed("Tài khoản chưa bị khóa.");
+                }
+
+                var result = await _userRepository.UpdateUserBlockStatus(userId, false);
+                if (result)
+                {
+                    return ServiceResult.Succeeded($"Đã mở khóa tài khoản {user.Username}.");
+                }
+                else
+                {
+                    return ServiceResult.Failed("Không thể mở khóa tài khoản. Vui lòng thử lại.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult.Failed($"Lỗi khi mở khóa tài khoản: {ex.Message}");
+            }
+        }
     }
     
 }

@@ -4,6 +4,7 @@ namespace FinacialProjectVersion3.Repository
 {
     public interface IUserRepository
     {
+        // ===========================user repo==========================
         Task<int> Create(User user);
         Task<bool> UsernameExists(string username);
         Task<bool> EmailExists(string email);
@@ -15,6 +16,8 @@ namespace FinacialProjectVersion3.Repository
         Task<bool> SaveChangesAsync();
         Task<bool> UpdateProfileAsync(User user);
         Task<bool> UpdateAvatarAsync(User user);
-
+        // ===========================admin repo==========================
+        Task<List<User>> GetAllUsers();
+        Task<bool> UpdateUserBlockStatus(int userId, bool isBlocked);
     }
 }

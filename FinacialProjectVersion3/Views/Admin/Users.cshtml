@@ -1,0 +1,125 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<FinacialProjectVersion3.Models.Entity.User>
+
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-users me-2"></i>Quản lý người dùng
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Họ tên</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model)
+                                {
+                                    <tr>
+                                        <td>@user.Id</td>
+                                        <td>@user.Username</td>
+                                        <td>@user.Email</td>
+                                        <td>@(user.FullName ?? "Chưa cập nhật")</td>
+                                        <td>
+                                            @if (user.Role == "admin")
+                                            {
+                                                <span class="badge bg-danger"><i class="fas fa-crown me-1"></i>Admin</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-primary"><i class="fas fa-user me-1"></i>User</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (user.IsBlocked)
+                                            {
+                                                <span class="badge bg-warning"><i class="fas fa-lock me-1"></i>Bị khóa</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Hoạt động</span>
+                                            }
+                                        </td>
+                                        <td>@user.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            @if (user.Role != "admin")
+                                            {
+                                                @if (user.IsBlocked)
+                                                {
+                                                    <form method="post" asp-action="UnblockUser" class="d-inline">
+                                                        <input type="hidden" name="userId" value="@user.Id" />
+                                                        <button type="submit" class="btn btn-success btn-sm"
+                                                                onclick="return confirm('Bạn có chắc muốn mở khóa tài khoản @user.Username?')">
+                                                            <i class="fas fa-unlock"></i> Mở khóa
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <form method="post" asp-action="BlockUser" class="d-inline">
+                                                        <input type="hidden" name="userId" value="@user.Id" />
+                                                        <button type="submit" class="btn btn-warning btn-sm"
+                                                                onclick="return confirm('Bạn có chắc muốn khóa tài khoản @user.Username?')">
+                                                            <i class="fas fa-lock"></i> Khóa
+                                                        </button>
+                                                    </form>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted"><i class="fas fa-shield-alt me-1"></i>Được bảo vệ</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Chưa có người dùng nào trong hệ thống.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

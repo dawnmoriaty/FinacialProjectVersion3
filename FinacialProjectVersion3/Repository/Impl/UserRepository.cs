@@ -166,5 +166,31 @@ namespace FinacialProjectVersion3.Repository.Impl
                 throw new Exception($"Lỗi khi cập nhật avatar: {ex.Message}", ex);
             }
         }
+        //============================admin repo implements==========================
+        public async Task<List<User>> GetAllUsers()
+        {
+            return await _context.Users
+                .OrderBy(u => u.Username)
+                .ToListAsync();
+        }
+        public async Task<bool> UpdateUserBlockStatus(int userId, bool isBlocked)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                    return false;
+
+                user.IsBlocked = isBlocked;
+                _context.Entry(user).State = EntityState.Modified;
+
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
