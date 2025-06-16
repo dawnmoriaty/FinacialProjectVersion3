@@ -6,6 +6,7 @@ namespace FinacialProjectVersion3.Repository.Impl
 {
     public class CategoryRepository : ICategoryRepository
     {
+        // depencency injection
         private readonly ApplicationDbContext _context;
 
         public CategoryRepository(ApplicationDbContext context)

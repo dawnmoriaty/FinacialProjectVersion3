@@ -16,7 +16,22 @@ namespace FinacialProjectVersion3.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-           
+
+            // Cấu hình relationships, indexes, constraints phức tạp
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                // Có thể override Data Annotation nếu cần
+                entity.Property(e => e.Amount).HasPrecision(18, 2);
+
+                // Cấu hình index
+                entity.HasIndex(e => e.TransactionDate);
+
+                // Cấu hình relationship
+                entity.HasOne(t => t.Category)
+                      .WithMany()
+                      .HasForeignKey(t => t.CategoryId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }
