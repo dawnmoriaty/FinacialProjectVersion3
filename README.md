@@ -17,8 +17,6 @@ FinacialProjectVersion3 là một hệ thống quản lý tài chính được x
 - Theo dõi ngân sách và chi tiêu
 - Báo cáo tài chính với biểu đồ trực quan
 - Quản lý tài sản và nợ
-- Phân tích xu hướng tài chính
-- Hệ thống thông báo và nhắc nhở
 - Bảo mật dữ liệu tài chính cá nhân
 
 ## Yêu cầu hệ thống
