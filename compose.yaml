@@ -1,0 +1,12 @@
+﻿version: '3.8'
+
+services:
+  # Service cho SQL Server
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=FinancialApp2025!@# 
+    ports:
+      - "1433:1433"
+          # "Server=localhost,1434;Database=FinancialProjectDB;User Id=sa;Password=FinancialApp2025!@#;TrustServerCertificate=true;MultipleActiveResultSets=true;"
