@@ -4,7 +4,7 @@ namespace Test_xUnit.TestHelper;
 using FinacialProjectVersion3.Data;
 public static  class TestContextDbFactory
 {
-    public static ApplicationDbContext CreateDbContext(string databaseName = null)
+    public static ApplicationDbContext CreateDbContext(string? databaseName = null)
     {
         if (string.IsNullOrEmpty(databaseName))
         {
