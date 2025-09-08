@@ -56,8 +56,10 @@ dotnet ef database update
 Mở file `appsettings.json` và cập nhật chuỗi kết nối đến cơ sở dữ liệu:
 
 ```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=YOUR_SERVER;Database=FinancialDB;Trusted_Connection=True;MultipleActiveResultSets=true"
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=YOUR_SERVER;Database=FinancialDB;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
 }
 ```
 
@@ -101,6 +103,33 @@ FinacialProjectVersion3/
 - Truy cập tab "Báo cáo" để xem các báo cáo tài chính
 - Sử dụng các bộ lọc để phân tích dữ liệu theo thời gian, danh mục...
 - Xuất báo cáo dưới dạng PDF hoặc Excel
+
+## Ảnh chụp màn hình (Screenshots)
+Dưới đây là một số ảnh chụp màn hình từ giao diện ứng dụng. Các ảnh nằm trong thư mục `ScreenShoot` của dự án.
+
+- Dashboard (Tổng quan)
+
+  ![Dashboard](./FinacialProjectVersion3/ScreenShoot/dashboard.png)
+
+- Dashboard (Alternate)
+
+  ![Dashboard 2](./FinacialProjectVersion3/ScreenShoot/dashboard2.png)
+
+- Đăng nhập (Login)
+
+  ![Login](./FinacialProjectVersion3/ScreenShoot/login.png)
+
+- Quản lý tài khoản admin (Admin Manager)
+
+  ![Admin Manager](./FinacialProjectVersion3/ScreenShoot/admin_manager.png)
+
+- Quản lý danh mục (Category)
+
+  ![Category](./FinacialProjectVersion3/ScreenShoot/category.png)
+
+- Trang hồ sơ người dùng (Profile)
+
+  ![Profile](./FinacialProjectVersion3/ScreenShoot/profile.png)
 
 ## Phát triển
 
