@@ -131,6 +131,14 @@ Dưới đây là một số ảnh chụp màn hình từ giao diện ứng dụ
 
   ![Profile](./FinacialProjectVersion3/ScreenShoot/profile.png)
 
+- Thêm danh mục (Category Form)
+
+  ![Category Form](./FinacialProjectVersion3/ScreenShoot/category_form.png)
+
+- Thêm / Sửa giao dịch (Transaction Form)
+
+  ![Transaction Form](./FinacialProjectVersion3/ScreenShoot/transaction_form.png)
+
 ## Phát triển
 
 ### Môi trường phát triển
